@@ -31,6 +31,9 @@ typedef CustomPump = Future<void> Function(WidgetTester);
 /// Typedef for wrapping a widget with one or more other widgets
 typedef WidgetWrapper = Widget Function(Widget);
 
+/// Typedef for wrapping a widget asynchronously.
+typedef AsyncWidgetWrapper = FutureOr<Widget> Function(Widget);
+
 /// Hook for running arbitrary behavior for a particular scenario
 typedef OnScenarioCreate = Future<void> Function(Key scenarioWidgetKey);
 
@@ -38,14 +41,14 @@ typedef OnScenarioCreate = Future<void> Function(Key scenarioWidgetKey);
 extension TestingToolsExtension on WidgetTester {
   /// Extension for a [WidgetTester] that pumps the widget and provides an optional [WidgetWrapper]
   ///
-  /// [WidgetWrapper] defaults to [materialAppWrapper]
+  /// [wrapper] defaults to [materialAppWrapper]
   ///
   /// [surfaceSize] set's the surface size, defaults to [_defaultSize]
   ///
   /// [textScaleSize] set's the text scale size (usually in a range from 1 to 3)
   Future<void> pumpWidgetBuilder(
     Widget widget, {
-    WidgetWrapper? wrapper,
+    AsyncWidgetWrapper? wrapper,
     Size surfaceSize = _defaultSize,
     double textScaleSize = 1.0,
   }) async {
@@ -53,7 +56,7 @@ extension TestingToolsExtension on WidgetTester {
 
     await _pumpAppWidget(
       this,
-      _wrapper(widget),
+      await _wrapper(widget),
       surfaceSize: surfaceSize,
       textScaleSize: textScaleSize,
     );
@@ -61,12 +64,12 @@ extension TestingToolsExtension on WidgetTester {
 
   /// Extension for a [WidgetTester] that pumps a [DeviceBuilder] class
   ///
-  /// [WidgetWrapper] defaults to [materialAppWrapper]
+  /// [wrapper] defaults to [materialAppWrapper]
   ///
   /// [textScaleSize] set's the text scale size (usually in a range from 1 to 3)
   Future<void> pumpDeviceBuilder(
     DeviceBuilder deviceBuilder, {
-    WidgetWrapper? wrapper,
+    AsyncWidgetWrapper? wrapper,
   }) async {
     await pumpWidgetBuilder(
       deviceBuilder.build(),
